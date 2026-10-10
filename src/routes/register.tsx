@@ -31,12 +31,12 @@ function RegisterPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (form.fullName.trim().length < 3) errs.fullName = "اكتب اسمك بالكامل (٣ أحرف على الأقل)";
-    if (form.fullName.length > 120) errs.fullName = "الاسم طويل جداً";
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = "اكتب بريد إلكتروني صحيح";
-    if (form.phone && !/^\+?[0-9\s-]{7,20}$/.test(form.phone)) errs.phone = "رقم الموبايل غير صحيح";
-    if (form.password.length < 8) errs.password = "كلمة المرور لازم تكون ٨ أحرف على الأقل";
-    if (form.password !== form.confirm) errs.confirm = "كلمتين المرور مش متطابقين";
+    if (form.fullName.trim().length < 3) errs["fullName"] = "اكتب اسمك بالكامل (٣ أحرف على الأقل)";
+    if (form.fullName.length > 120) errs["fullName"] = "الاسم طويل جداً";
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) errs["email"] = "اكتب بريد إلكتروني صحيح";
+    if (form.phone && !/^\+?[0-9\s-]{7,20}$/.test(form.phone)) errs["phone"] = "رقم الموبايل غير صحيح";
+    if (form.password.length < 8) errs["password"] = "كلمة المرور لازم تكون ٨ أحرف على الأقل";
+    if (form.password !== form.confirm) errs["confirm"] = "كلمتين المرور مش متطابقين";
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setLoading(true);
@@ -72,27 +72,27 @@ function RegisterPage() {
         <div>
           <Label htmlFor="fullName">الاسم بالكامل</Label>
           <Input id="fullName" autoComplete="name" value={form.fullName} onChange={set("fullName")} />
-          <FieldError msg={errors.fullName} />
+          <FieldError msg={errors["fullName"]} />
         </div>
         <div>
           <Label htmlFor="email">البريد الإلكتروني</Label>
           <Input id="email" type="email" dir="ltr" autoComplete="email" value={form.email} onChange={set("email")} />
-          <FieldError msg={errors.email} />
+          <FieldError msg={errors["email"]} />
         </div>
         <div>
           <Label htmlFor="phone">رقم الموبايل (اختياري)</Label>
           <Input id="phone" type="tel" dir="ltr" autoComplete="tel" value={form.phone} onChange={set("phone")} />
-          <FieldError msg={errors.phone} />
+          <FieldError msg={errors["phone"]} />
         </div>
         <div>
           <Label htmlFor="password">كلمة المرور</Label>
           <Input id="password" type="password" dir="ltr" autoComplete="new-password" value={form.password} onChange={set("password")} />
-          <FieldError msg={errors.password} />
+          <FieldError msg={errors["password"]} />
         </div>
         <div>
           <Label htmlFor="confirm">تأكيد كلمة المرور</Label>
           <Input id="confirm" type="password" dir="ltr" autoComplete="new-password" value={form.confirm} onChange={set("confirm")} />
-          <FieldError msg={errors.confirm} />
+          <FieldError msg={errors["confirm"]} />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>{loading ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}</Button>
       </form>

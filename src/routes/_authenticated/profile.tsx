@@ -33,8 +33,8 @@ function ProfilePage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (fullName.trim().length < 3 || fullName.length > 120) errs.fullName = "الاسم لازم يكون بين ٣ و ١٢٠ حرف";
-    if (phone && !/^\+?[0-9\s-]{7,20}$/.test(phone)) errs.phone = "رقم الموبايل غير صحيح";
+    if (fullName.trim().length < 3 || fullName.length > 120) errs["fullName"] = "الاسم لازم يكون بين ٣ و ١٢٠ حرف";
+    if (phone && !/^\+?[0-9\s-]{7,20}$/.test(phone)) errs["phone"] = "رقم الموبايل غير صحيح";
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setSaving(true);
@@ -55,8 +55,8 @@ function ProfilePage() {
         {me.profile?.student_code && <div><p className="text-muted-foreground">كود الطالب</p><p className="font-medium">{me.profile.student_code}</p></div>}
       </div>
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
-        <div><Label htmlFor="fn">الاسم بالكامل</Label><Input id="fn" value={fullName} onChange={(e) => setFullName(e.target.value)} /><FieldError msg={errors.fullName} /></div>
-        <div><Label htmlFor="ph">رقم الموبايل</Label><Input id="ph" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} /><FieldError msg={errors.phone} /></div>
+        <div><Label htmlFor="fn">الاسم بالكامل</Label><Input id="fn" value={fullName} onChange={(e) => setFullName(e.target.value)} /><FieldError msg={errors["fullName"]} /></div>
+        <div><Label htmlFor="ph">رقم الموبايل</Label><Input id="ph" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} /><FieldError msg={errors["phone"]} /></div>
         <Button type="submit" disabled={saving}>{saving ? "جاري الحفظ..." : "حفظ التعديلات"}</Button>
       </form>
     </div>
