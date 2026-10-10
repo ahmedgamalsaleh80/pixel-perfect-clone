@@ -32,8 +32,8 @@ function LoginPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!/^\S+@\S+\.\S+$/.test(email)) errs.email = "اكتب بريد إلكتروني صحيح";
-    if (!password) errs.password = "اكتب كلمة المرور";
+    if (!/^\S+@\S+\.\S+$/.test(email)) errs["email"] = "اكتب بريد إلكتروني صحيح";
+    if (!password) errs["password"] = "اكتب كلمة المرور";
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setLoading(true);
@@ -57,7 +57,7 @@ function LoginPage() {
         <div>
           <Label htmlFor="email">البريد الإلكتروني</Label>
           <Input id="email" type="email" dir="ltr" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <FieldError msg={errors.email} />
+          <FieldError msg={errors["email"]} />
         </div>
         <div>
           <div className="flex items-center justify-between">
@@ -65,7 +65,7 @@ function LoginPage() {
             <Link to="/forgot-password" className="text-xs text-primary hover:underline">نسيت كلمة المرور؟</Link>
           </div>
           <Input id="password" type="password" dir="ltr" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <FieldError msg={errors.password} />
+          <FieldError msg={errors["password"]} />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>{loading ? "جاري الدخول..." : "تسجيل الدخول"}</Button>
       </form>
