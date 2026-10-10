@@ -1,77 +1,60 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { KeyRound } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { authErrorMessage } from "@/lib/auth";
+import { AuthCard, FieldError } from "@/components/AuthCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "استعادة كلمة المرور — منصة المهندس أحمد جمال" },
-      { name: "description", content: "استعد كلمة المرور الخاصة بحسابك على المنصة." },
-      { property: "og:title", content: "استعادة كلمة المرور — منصة المهندس أحمد جمال" },
-      { property: "og:description", content: "استعد كلمة المرور الخاصة بحسابك." },
+      { title: "تعيين كلمة مرور جديدة — منصة المهندس أحمد جمال" },
+      { name: "description", content: "عيّن كلمة مرور جديدة لحسابك." },
+      { property: "og:title", content: "تعيين كلمة مرور جديدة" },
+      { property: "og:description", content: "عيّن كلمة مرور جديدة لحسابك." },
+      { name: "robots", content: "noindex" },
     ],
   }),
-  component: ResetPasswordPage,
+  component: ResetPage,
 });
 
-function ResetPasswordPage() {
+function ResetPage() {
+  const navigate = useNavigate();
+  const [pw, setPw] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [err, setErr] = useState<string>();
   const [loading, setLoading] = useState(false);
 
-  // هيتم ربطه بـ Supabase resetPasswordForEmail في المرحلة 2
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (pw.length < 8) return setErr("كلمة المرور لازم تكون ٨ أحرف على الأقل");
+    if (pw !== confirm) return setErr("كلمتين المرور مش متطابقين");
+    setErr(undefined);
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
+    const { error } = await supabase.auth.updateUser({ password: pw });
     setLoading(false);
-    toast.info("جاري تجهيز خاصية استعادة كلمة المرور", {
-      description: "هيتم تفعيلها مع نظام المصادقة في المرحلة التالية.",
-    });
+    if (error) return void toast.error(error.message.includes("session") ? "الرابط انتهت صلاحيته، اطلب رابط جديد" : authErrorMessage(error.message));
+    toast.success("تم تغيير كلمة المرور بنجاح");
+    navigate({ to: "/dashboard" });
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-hero-gradient px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card-gradient p-8 shadow-2xl shadow-black/30">
-        <div className="flex flex-col items-center text-center">
-          <span className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <KeyRound className="size-6" />
-          </span>
-          <h1 className="mt-4 font-display text-2xl font-bold">استعادة كلمة المرور</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            اكتب بريدك الإلكتروني وهنبعتلك رابط إعادة تعيين كلمة المرور
-          </p>
+    <AuthCard title="تعيين كلمة مرور جديدة">
+      <form onSubmit={onSubmit} className="space-y-4" noValidate>
+        <div>
+          <Label htmlFor="pw">كلمة المرور الجديدة</Label>
+          <Input id="pw" type="password" dir="ltr" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} />
         </div>
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="email" className="text-sm font-medium">
-              البريد الإلكتروني
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              dir="ltr"
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/30"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-primary py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 disabled:opacity-60"
-          >
-            {loading ? "جاري الإرسال..." : "إرسال رابط الاستعادة"}
-          </button>
-        </form>
-
-        <div className="mt-6 border-t border-border/60 pt-4 text-center text-sm text-muted-foreground">
-          فاكر كلمة المرور؟{" "}
-          <Link to="/auth" search={{ mode: "login" }} className="font-medium text-primary hover:underline">
-            سجّل دخولك
-          </Link>
+        <div>
+          <Label htmlFor="confirm">تأكيد كلمة المرور</Label>
+          <Input id="confirm" type="password" dir="ltr" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <FieldError msg={err} />
         </div>
-      </div>
-    </div>
+        <Button type="submit" className="w-full" disabled={loading}>{loading ? "جاري الحفظ..." : "حفظ كلمة المرور"}</Button>
+      </form>
+    </AuthCard>
   );
 }

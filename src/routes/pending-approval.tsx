@@ -1,59 +1,54 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Hourglass, Mail, ShieldCheck } from "lucide-react";
+import { Clock, Ban, XCircle, CheckCircle2 } from "lucide-react";
+import { useMe } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/pending-approval")({
+  ssr: false,
   head: () => ({
     meta: [
-      { title: "حسابك قيد المراجعة — منصة المهندس أحمد جمال" },
-      { name: "description", content: "حسابك قيد المراجعة من إدارة المنصة." },
-      { property: "og:title", content: "حسابك قيد المراجعة — منصة المهندس أحمد جمال" },
-      { property: "og:description", content: "حسابك قيد المراجعة من إدارة المنصة." },
+      { title: "حالة الحساب — منصة المهندس أحمد جمال" },
+      { name: "description", content: "متابعة حالة مراجعة حسابك على المنصة." },
+      { property: "og:title", content: "حالة الحساب — منصة المهندس أحمد جمال" },
+      { property: "og:description", content: "متابعة حالة مراجعة حسابك." },
+      { name: "robots", content: "noindex" },
     ],
   }),
-  component: PendingApprovalPage,
+  component: PendingPage,
 });
 
-function PendingApprovalPage() {
+const states = {
+  pending: { icon: Clock, tone: "text-warning", title: "حسابك قيد المراجعة", body: "استلمنا طلبك، والإدارة هتراجع حسابك قريب. أول ما يتوافق عليه هتقدر تدخل على كورساتك." },
+  rejected: { icon: XCircle, tone: "text-destructive", title: "تم رفض طلب التسجيل", body: "للأسف طلبك اترفض. لو شايف إن ده حصل بالغلط تواصل مع الإدارة." },
+  suspended: { icon: Ban, tone: "text-destructive", title: "حسابك موقوف حالياً", body: "تم إيقاف الوصول للمحتوى مؤقتاً. تواصل مع الإدارة لمعرفة التفاصيل." },
+  approved: { icon: CheckCircle2, tone: "text-success", title: "حسابك معتمد", body: "تقدر دلوقتي تدخل على كورساتك." },
+} as const;
+
+function PendingPage() {
+  const { data: me, isLoading, refetch, isFetching } = useMe();
+  if (isLoading) return <div className="mx-auto max-w-md px-4 py-24"><Skeleton className="h-60 w-full" /></div>;
+  if (!me) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-24 text-center">
+        <p className="text-muted-foreground">سجّل دخولك الأول عشان تشوف حالة حسابك.</p>
+        <Button asChild className="mt-4"><Link to="/login">تسجيل الدخول</Link></Button>
+      </div>
+    );
+  }
+  const status = me.profile?.account_status ?? "pending";
+  const s = states[status];
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-hero-gradient px-4 py-12">
-      <div className="w-full max-w-lg rounded-2xl border border-border/60 bg-card-gradient p-10 text-center shadow-2xl shadow-black/30">
-        <span className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-warning/15 text-warning">
-          <Hourglass className="size-8" />
-        </span>
-        <h1 className="mt-6 font-display text-2xl font-bold">حسابك قيد المراجعة</h1>
-        <p className="mt-3 leading-relaxed text-muted-foreground">
-          شكراً لتسجيلك في منصة المهندس أحمد جمال. حسابك دلوقتي في حالة
-          <span className="font-semibold text-warning"> "قيد المراجعة" </span>
-          وهيتم تفعيله فور موافقة الإدارة.
-        </p>
-
-        <div className="mt-8 space-y-3 text-start">
-          <div className="flex items-start gap-3 rounded-xl border border-border/60 bg-background/50 p-4">
-            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-semibold">ليه في مراجعة؟</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                بنراجع كل حساب جديد عشان نحافظ على جودة المجتمع ونحمي المحتوى التعليمي.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 rounded-xl border border-border/60 bg-background/50 p-4">
-            <Mail className="mt-0.5 size-5 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-semibold">هتعرف إمتى؟</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                فور الموافقة على حسابك هتقدر تسجل دخولك وتدخل على الكورسات المخصصة ليك مباشرة.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <Link
-          to="/"
-          className="mt-8 inline-flex rounded-lg border border-border bg-card px-6 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
-        >
-          العودة للرئيسية
-        </Link>
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-hero-gradient px-4">
+      <div className="max-w-md rounded-2xl border border-border/60 bg-card-gradient p-8 text-center">
+        <s.icon className={`mx-auto size-12 ${s.tone}`} />
+        <h1 className="mt-4 font-display text-2xl font-bold">{s.title}</h1>
+        <p className="mt-3 leading-relaxed text-muted-foreground">{s.body}</p>
+        {status === "approved" || me.isAdmin ? (
+          <Button asChild className="mt-6"><Link to={me.isAdmin ? "/admin" : "/dashboard"}>الذهاب للوحة التحكم</Link></Button>
+        ) : (
+          <Button variant="outline" className="mt-6" onClick={() => refetch()} disabled={isFetching}>{isFetching ? "جاري التحقق..." : "تحديث الحالة"}</Button>
+        )}
       </div>
     </div>
   );
