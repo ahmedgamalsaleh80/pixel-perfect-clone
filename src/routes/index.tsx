@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Code2, BrainCircuit, ShieldCheck, PlayCircle, Users, ArrowLeft } from "lucide-react";
+import { Code2, BrainCircuit, ShieldCheck, ArrowLeft } from "lucide-react";
+import { PublishedCourses } from "@/components/PublishedCourses";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,11 +39,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { icon: PlayCircle, value: "+120", label: "درس فيديو" },
-  { icon: Users, value: "+500", label: "طالب مسجل" },
-  { icon: Code2, value: "+8", label: "كورسات متخصصة" },
-];
 
 function Index() {
   return (
@@ -62,32 +58,23 @@ function Index() {
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
-            to="/auth"
-            search={{ mode: "register" }}
+            to="/register"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/40"
           >
             ابدأ رحلتك دلوقتي
             <ArrowLeft className="size-4" />
           </Link>
-          <Link
-            to="/courses"
+          <a
+            href="#courses"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 font-semibold text-foreground transition-colors hover:bg-accent"
           >
             تصفح الكورسات
-          </Link>
+          </a>
         </div>
 
-        {/* Stats */}
-        <div className="mt-16 grid w-full max-w-2xl grid-cols-3 gap-4">
-          {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-border/60 bg-card-gradient p-4">
-              <s.icon className="mx-auto size-6 text-primary" />
-              <p className="mt-2 font-display text-2xl font-bold">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </div>
-          ))}
-        </div>
       </section>
+
+      <PublishedCourses />
 
       {/* Features */}
       <section className="mx-auto max-w-6xl px-4 pb-24">
@@ -119,8 +106,7 @@ function Index() {
             سجّل حسابك وهيتم مراجعته من الإدارة، وبعد الموافقة هتقدر تدخل على الكورسات المخصصة ليك.
           </p>
           <Link
-            to="/auth"
-            search={{ mode: "register" }}
+            to="/register"
             className="mt-8 inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90"
           >
             إنشاء حساب جديد
